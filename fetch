@@ -1,0 +1,40 @@
+#! /usr/bin/env ruby
+
+require 'optparse'
+require_relative 'src/file_meta_extractor'
+require_relative 'src/file_downloader'
+
+def show_meta_info(urls)
+  files_meta = FileMetaExtractor.new.get_file_meta(urls, __dir__)
+  puts "Meta Info: "
+  files_meta.each do |meta|
+    puts meta
+    puts "---------------------------------------------"
+  end
+end
+
+def download_files(urls)
+  urls.each do |url|
+    FileDownloader.new.download(url, __dir__)
+  end
+end
+
+options = {}
+
+OptionParser.new do |op|
+  op.banner = "Usage: ./fetch URL1 URL2"
+  op.on("--metadata", "--metadata", "to see meta info") do |value|
+ 	options[:meta] = value
+  end
+end.parse!
+
+urls = ARGV.to_a
+if urls.empty?
+  puts "Please provide links.\n e.g. https://www.google.com"
+else
+  if options[:meta]
+    show_meta_info(urls)
+  else
+    download_files(urls)
+  end
+end
